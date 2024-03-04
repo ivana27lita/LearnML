@@ -23,4 +23,6 @@ To run the Streamlit app, use the following command:
  ```bash
     streamlit run dashboard.py
  ```
+
+You can access this repository through Github: https://github.com/ivana27lita/LearnML/
     
