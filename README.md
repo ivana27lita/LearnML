@@ -24,5 +24,6 @@ To run the Streamlit app, use the following command:
     streamlit run dashboard.py
  ```
 
+## Github Access
 You can access this repository through Github: https://github.com/ivana27lita/LearnML/
     
