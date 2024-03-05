@@ -76,21 +76,42 @@ with col2:
     st.write(f"Jumlah Casual User dari {start_date} hingga {end_date}: **{filtered_df['casual'].sum()}**")
     st.write(f"Jumlah Registered User dari {start_date} hingga {end_date}: **{filtered_df['registered'].sum()}**")
 
-# Visualisasi 2
-# dengan bar plot
-fig2, ax = plt.subplots(figsize=(8, 4))
-df_user = pd.melt(filtered_df, id_vars='month', value_vars=['casual', 'registered'])
-
-sns.barplot(x='month', y='value', hue='variable', data=df_user, ax=ax, palette=['blue', 'orange'], ci=None)
-ax.set_xlabel('Bulan')
-ax.set_ylabel('Jumlah Pengguna')
-ax.legend(title='Kategori')
-ax.set_title('Jumlah Casual dan Registered User per Bulan')
-st.pyplot(fig2)
-
 st.subheader('Jumlah Penyewaan Unit Sepeda')
 
+# Visualisasi 2
+season_weather_counts = day_df.groupby(['season', 'weather'])['total_count'].sum()
+st.table(season_weather_counts.reset_index())
+
+fig4 = plt.figure(figsize=(8, 5))
+
+sns.barplot(x='season', y='total_count', hue='weather', data=filtered_df, palette='PuBu',  ci=None)
+
+plt.xlabel("Season")
+plt.ylabel("Total Rides")
+plt.title("Jumlah Sepeda yang Disewa berdasarkan Cuaca dan Musim")
+
+plt.legend(title='Weather', loc='upper left')
+
+st.pyplot(fig4)
+
 # Visualisasi 3
+st.subheader('Pola Pemakaian Sepeda tahun 2011 - 2012')
+
+fig5 = plt.figure(figsize=(8,5))
+
+sns.barplot(x='month', y='total_count', hue='year', data=filtered_df, palette='Paired',  ci=None)
+
+sns.lineplot(x='month', y='total_count', hue='year', data=filtered_df, linestyle='solid',  ci=None, markers=True)
+
+plt.xlabel("Month")
+plt.ylabel("Total Rides")
+plt.title("Total Bike Sharing Per Bulan")
+plt.legend(title='Year', loc='upper left')
+
+st.pyplot(fig5)
+
+
+# Visualisasi 4
 # Hitung rata-rata penggunaan sepeda per bulan
 monthly_avg = filtered_df.groupby('month')['total_count'].mean().reset_index()
 
@@ -116,29 +137,31 @@ plt.xticks(ticks=range(1, 13), labels=['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
 plt.legend(loc='upper left')
 st.pyplot(fig3)
 
-# Visualisasi 4
-fig4 = plt.figure(figsize=(8, 5))
-
-sns.barplot(x='season', y='total_count', hue='weather', data=filtered_df, palette='PuBu',  ci=None)
-
-plt.xlabel("Season")
-plt.ylabel("Total Rides")
-plt.title("Jumlah Sepeda yang Disewa berdasarkan Cuaca dan Musim")
-
-plt.legend(title='Weather', loc='upper left')
-
-st.pyplot(fig4)
-
 # Visualisasi 5
-fig5 = plt.figure(figsize=(8,5))
+st.subheader('Persebaran Jumlah Penyewaan Unit Sepeda Berdasarkan Tingkat Pemakaian')
 
-sns.barplot(x='month', y='total_count', hue='year', data=filtered_df, palette='Paired',  ci=None)
+# Ambil kolom-kolom yang akan digunakan untuk clustering
+columns_for_clustering = ['total_count', 'temperature', 'humidity', 'windspeed']
+clustering_data = day_df[columns_for_clustering]
 
-sns.lineplot(x='month', y='total_count', hue='year', data=filtered_df, linestyle='solid',  ci=None, markers=True)
+# Tentukan kriteria dan analisis secara kualitatif, kriteria ditentukan berdasarkan rata-rata total_count yaitu sekitar 4500
+def classify_day(row):
+    if row['total_count'] > 4500:
+        return 'High Usage'
+    elif row['total_count'] >= 2000 and row['total_count'] <= 4500 :
+        return 'Medium Usage'
+    else:
+        return 'Low Usage'
 
-plt.xlabel("Month")
-plt.ylabel("Total Rides")
-plt.title("Total Bike Sharing Per Bulan")
-plt.legend(title='Year', loc='upper left')
+day_df['usage_class'] = day_df.apply(classify_day, axis=1)
 
-st.pyplot(fig5)
+# Visualisasikan ciri khas dari masing-masing kelompok menggunakan boxplot
+fig6 = plt.figure(figsize=(10, 6))
+
+for i, column in enumerate(columns_for_clustering):
+    plt.subplot(2, 2, i+1)
+    sns.boxplot(x='usage_class', y=column, data=day_df, palette='Blues', showfliers=False)
+    plt.title(f'Distribution of {column} Across Usage Classes')
+
+plt.tight_layout()
+st.pyplot(fig6)
