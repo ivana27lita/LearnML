@@ -3,6 +3,8 @@ Dashboard ini menampilkan data penyewaan sepeda pada Capital Bike dalam rentang 
 
 Data source: https://drive.google.com/file/d/1RaBmV6Q6FYWU4HWZs80Suqd7KQC34diQ/view?usp=sharing
 
+Berikut dashboard yang telah di-publish pada streamlit cloud: https://ivana27lita-bikedashboard.streamlit.app/
+
 ## Installation
 1. Clone this repository to your local machine
  ```bash
